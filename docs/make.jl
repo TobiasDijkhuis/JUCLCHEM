@@ -1,10 +1,14 @@
 using Documenter
 using JUCLCHEM
 
-pages = Any[
-    "Home" => "index.md",
-    "API" => "api.md",
-]
+pages = Any["Home"=>"index.md", "API"=>"api.md"]
 
-makedocs(sitename = "JUCLCHEM", authors = "Tobias Dijkhuis", pages = pages, modules = [JUCLCHEM], clean = true, pagesonly = true)
+makedocs(
+    sitename = "JUCLCHEM",
+    authors = "Tobias Dijkhuis",
+    pages = pages,
+    modules = [JUCLCHEM],
+    clean = true,
+    pagesonly = true,
+)
 deploydocs(repo = "github.com/TobiasDijkhuis/JUCLCHEM.git", push_preview = true)
