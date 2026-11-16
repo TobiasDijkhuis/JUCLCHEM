@@ -1,8 +1,28 @@
 using PhysicalConstants.CODATA2022: AtomicMassConstant
 
-include("chemistry.jl")
-
 const H2_FLUX_CT = 1.0e-10
+
+"""
+    get_thermal_velocity(mass, T)
+
+
+``v_{\\mathrm{th}}=\\sqrt{\\frac{8k_\\mathrm{B}T}{πm}}``
+"""
+function get_thermal_velocity(mass::AbstractFloat, T::AbstractFloat)::AbstractFloat
+    thermal_vel = √(8 * k_B * T / (π * AtomicMassConstant * mass))
+    return thermal_vel
+end
+
+"""
+    get_arrhenius_probability(E_reac, temperature)
+
+``e^{-E/T}``"""
+function get_arrhenius_probability(
+    E_reac::AbstractFloat,
+    temperature::AbstractFloat,
+)::AbstractFloat
+    return exp(-E_reac / temperature)
+end
 
 """
     get_sticking_coefficient_Hollenbach_McKee(T_gas, T_dust)
@@ -17,6 +37,11 @@ function get_sticking_coefficient_Hollenbach_McKee(
     return S
 end
 
+"""
+    get_factor_1(μ, ν, E_H2, T_dust)
+
+The first term in equation 15 from Cazaux & Tielens, 2002.
+"""
 function _get_factor_1(
     μ::AbstractFloat,
     ν::AbstractFloat,
@@ -26,6 +51,10 @@ function _get_factor_1(
     return μ * H2_FLUX_CT / (2 * ν * get_arrhenius_probability(E_H2, T_dust))
 end
 
+"""
+    _get_factor_2(E_HC, E_S, E_HP, T_dust)
+
+Equation 17 from Cazaux & Tielens, 2002."""
 function _get_factor_2(
     E_HC::AbstractFloat,
     E_S::AbstractFloat,
@@ -36,7 +65,18 @@ function _get_factor_2(
            get_arrhenius_probability(E_S, T_dust)
 end
 
-function _get_ϵ(ν, E_HC, E_S, E_HP, T_dust)::AbstractFloat
+"""
+    _get_ϵ(\nu, E_HC, E_S, E_HP, T_dust
+
+Equation 16 from Cazaux & Tielens, 2002.
+"""
+function _get_ϵ(
+    ν::AbstractFloat,
+    E_HC::AbstractFloat,
+    E_S::AbstractFloat,
+    E_HP::AbstractFloat,
+    T_dust::AbstractFloat,
+)::AbstractFloat
     return 1 / (
         1 +
         ν / (2 * H2_FLUX_CT) *

@@ -5,28 +5,6 @@ include("gasphase_reactions.jl")
 include("grain_reactions.jl")
 
 """
-    get_arrhenius_probability(E_reac, temperature)
-
-``e^{-E/T}``"""
-function get_arrhenius_probability(
-    E_reac::AbstractFloat,
-    temperature::AbstractFloat,
-)::AbstractFloat
-    return exp(-E_reac / temperature)
-end
-
-"""
-    get_thermal_velocity(mass, T)
-
-
-``v_{\\mathrm{th}}=\\sqrt{\\frac{8k_\\mathrm{B}T}{πm}}``
-"""
-function get_thermal_velocity(mass::AbstractFloat, T::AbstractFloat)::AbstractFloat
-    thermal_vel = √(8 * k_B * T / (π * AtomicMassConstant * mass))
-    return thermal_vel
-end
-
-"""
     get_freezeout_rate_constant(α, β, mass, T_gas, freeze_factor=1)
 
 ``\\alpha(1+\\beta*1.671e-4/(r_{\\mathrm{grain}}T_{\\mathrm{gas}})*freeze_factor*v_{\\mathrm{th}}*GRAIN_CROSSSECTION_PER_H``
