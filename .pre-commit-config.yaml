@@ -10,4 +10,5 @@ repos:
   - repo: https://github.com/JuliaEditorSupport/JuliaFormatter.jl
     rev: v2.14.12
     hooks:
-    - id: "julia-formatter"
+    - id: "jlfmt"
+      args: ["--jlfmt-path=~/.julia/bin/jlfmt"]
