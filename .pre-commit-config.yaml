@@ -1,0 +1,13 @@
+repos:
+  - repo: https://github.com/crate-ci/typos
+    rev: v1.52.2
+    hooks:
+      - id: typos
+        name: "check spelling errors"
+        description: "Check for spelling errors in files"
+        args: []
+        pass_filenames: false
+  - repo: https://github.com/fredrikekre/runic-pre-commit
+    rev: v2.2.0
+    hooks:
+      - id: runic

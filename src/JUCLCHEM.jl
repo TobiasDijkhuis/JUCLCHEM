@@ -1,17 +1,17 @@
 module JUCLCHEM
+using Catalyst: species, Reaction
+using CSV: File
+include("species.jl")
+using .SpeciesModule: Species
 
-"""
-    hello(who::String)
-
-Return "Hello, `who`".
-"""
-hello(who::String) = "Hello, $who"
-
-"""
-    domath(x::Number)
-
-Return `x + 5`.
-"""
-domath(x::Number) = x + 5
+"""Read the species from a file `file`."""
+function read_species_list(file::AbstractString)::Vector{species}
+    species_vector = Vector{Species}(nothing)
+    for row in CSV.File(file)
+        species = Species(row)
+        push!(species_vector, species)
+    end
+    return
+end
 
 end # module JUCLCHEM

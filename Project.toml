@@ -3,10 +3,17 @@ uuid = "1cef3fa9-e8f6-4710-aaef-3b323d294f4f"
 version = "0.1.0"
 authors = ["Tobias Dijkhuis <tobiasdijkhuis@hotmail.com>"]
 
+[workspace]
+projects = ["docs"]
+
 [deps]
+CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
 Catalyst = "479239e8-5488-4da2-87a7-35f2df7eef83"
+Runic = "62bfec6d-59d7-401d-8490-b29ee721c001"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
+CSV = "1.3.0"
 Catalyst = "17.0.1"
+Runic = "1.13.0"
 Test = "1.11.0"
