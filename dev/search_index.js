@@ -1,3 +1,3 @@
 var documenterSearchIndex = {"docs":
-[{"category":"section","location":"#JUCLCHEM","page":"JUCLCHEM","text":"Welcome to the JUCLCHEM documentation.","title":"JUCLCHEM"}]
+[{"category":"section","location":"api/#Chemistry","page":"API","text":"","title":"Chemistry"},{"category":"method","location":"api/#JUCLCHEM.get_arrhenius_probability-Tuple{Float64, Float64}","page":"API","text":"e^{-E/T}\n\n\n\n\n\n","title":"JUCLCHEM.get_arrhenius_probability"},{"category":"method","location":"api/#JUCLCHEM.get_tunneling_probability-Tuple{Float64, Float64, Float64}","page":"API","text":"e^{-2a/ħ√{2μ{ij}E{reac}}}\n\n\n\n\n\n","title":"JUCLCHEM.get_tunneling_probability"},{"category":"section","location":"#JUCLCHEM","page":"Home","text":"Welcome to the JUCLCHEM documentation.","title":"JUCLCHEM"}]
 }
