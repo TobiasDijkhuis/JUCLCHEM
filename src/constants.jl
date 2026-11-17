@@ -30,8 +30,8 @@ const GAS_DUST_MASS_DENSITY_RATIO = 100.0
 """``N_{\\mathrm{gas}}/N_{\\mathrm{dust}}``
 
 Note that this is defined as the reciprocal as it is in UCLCHEM."""
-const GAS_DUST_NUMBER_DENSITY_RATIO =
-    AtomicMassConstant / (GRAIN_MASS * GAS_DUST_MASS_DENSITY_RATIO)
+const GAS_DUST_NUMBER_DENSITY_RATIO = AtomicMassConstant /
+    (GRAIN_MASS * GAS_DUST_MASS_DENSITY_RATIO)
 
 """Number of sites on grain surface (m``^{-1}``)"""
 const GRAIN_SURFACE_SITE_DENSITY = 1.5e19

@@ -1,7 +1,7 @@
 using Documenter
 using JUCLCHEM
 
-pages = Any["Home"=>"index.md", "API"=>"api.md"]
+pages = Any["Home" => "index.md", "API" => "api.md"]
 
 makedocs(
     sitename = "JUCLCHEM",

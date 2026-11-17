@@ -20,9 +20,8 @@ function get_freezeout_rate_constant(
         return 0
     end
 
-    thermal_vel = get_thermal_velocity(mass, T)
-    rate_constant =
-        α *
+    thermal_vel = get_thermal_velocity(mass, T_gas)
+    rate_constant = α *
         (1 + β * 16.71e-4 / (GRAIN_RADIUS * T_gas)) *
         freeze_factor *
         thermal_vel *
@@ -73,7 +72,7 @@ end
 
 """
 function construct_elements_per_species_matrix(
-    constituent_dicts::AbstractVector{AbstractDict{AbstractString,Int}},
+    constituent_dicts::AbstractVector{AbstractDict{AbstractString, Int}},
     elements::AbstractVector{AbstractString},
 )::AbstractMatrix{Int}
     num_species = length(constituent_dicts)

@@ -1,4 +1,6 @@
-using PhysicalConstants.CODATA2022: AtomicMassConstant
+using PhysicalConstants.CODATA2022: AtomicMassConstant, k_B
+
+include("constants.jl")
 
 const H2_FLUX_CT = 1.0e-10
 
@@ -61,8 +63,9 @@ function _get_factor_2(
     E_HP::AbstractFloat,
     T_dust::AbstractFloat,
 )::AbstractFloat
-    return (1 + √((E_HC - E_S) / (E_HP - E_S)))^2 / 4 *
-           get_arrhenius_probability(E_S, T_dust)
+    return (1 + √((E_HC - E_S) / (E_HP - E_S)))^2 /
+        4 *
+        get_arrhenius_probability(E_S, T_dust)
 end
 
 """
@@ -77,16 +80,18 @@ function _get_ϵ(
     E_HP::AbstractFloat,
     T_dust::AbstractFloat,
 )::AbstractFloat
-    return 1 / (
-        1 +
-        ν / (2 * H2_FLUX_CT) *
-        get_arrhenius_probability(-1.5 * E_HC, T_dust) *
-        (1 + √((E_HC - E_S) / (E_HP - E_S)))^2
-    )
+    return 1 /
+        (
+            1 +
+                ν /
+                    (2 * H2_FLUX_CT) *
+                    get_arrhenius_probability(-1.5 * E_HC, T_dust) *
+                    (1 + √((E_HC - E_S) / (E_HP - E_S)))^2
+        )
 end
 
-const GRAIN_DATA = ImmutableDict{
-    "Si" => ImmutableDict{
+const GRAIN_DATA = Base.ImmutableDict(
+    "Si" => Base.ImmutableDict(
         "μ" => 0.005,
         "E_S" => 110.0,
         "E_H2" => 320.0,
@@ -95,8 +100,8 @@ const GRAIN_DATA = ImmutableDict{
         "ν_H2" => 3.0e12,
         "ν_H" => 1.3e13,
         "CROSS_SECTION" => 8.437e22,
-    },
-    "Gr" => ImmutableDict{
+    ),
+    "Gr" => Base.ImmutableDict(
         "μ" => 0.005,
         "E_S" => 260.0,
         "E_H2" => 520.0,
@@ -105,8 +110,8 @@ const GRAIN_DATA = ImmutableDict{
         "ν_H2" => 3.0e12,
         "ν_H" => 1.3e13,
         "CROSS_SECTION" => 0.5,
-    },
-}
+    ),
+)
 
 function get_formation_efficiency(
     material::AbstractString,
@@ -133,14 +138,15 @@ function get_CT_H2_form_efficiency(
     sticking_coefficient = get_sticking_coefficient_Hollenbach_McKee(T_gas, T_dust)
 
     graphite_efficiency = get_formation_efficiency("Gr", T_dust)
-    graphite_rate =
-        v_th *
+    graphite_rate = v_th *
         sticking_coefficient *
         GRAIN_DATA["Gr"]["CROSS_SECTION"] *
         graphite_efficiency
     silicon_efficiency = get_formation_efficiency("Si", T_dust)
-    silicon_rate =
-        v_th * sticking_coefficient * GRAIN_DATA["Si"]["CROSS_SECTION"] * silicon_efficiency
+    silicon_rate = v_th *
+        sticking_coefficient *
+        GRAIN_DATA["Si"]["CROSS_SECTION"] *
+        silicon_efficiency
 
     return 0.5 * (graphite_rate + silicon_rate)
 end
@@ -165,7 +171,9 @@ end
 ``\\nu_{\\mathrm{HH}}=\\sqrt{2*SURFACE_SITE_DENSITY*E_{\\mathrm{bind}}/(π^2m)}``
 """
 function get_ν_HH(E_bind::AbstractFloat, mass::AbstractFloat)::AbstractFloat
-    return √(2 * SURFACE_SITE_DENSITY * E_bind * k_B / (mass * AtomicMassConstant * π^2))
+    return √(
+        2 * GRAIN_SURFACE_SITE_DENSITY * E_bind * k_B / (mass * AtomicMassConstant * π^2)
+    )
 end
 
 """
