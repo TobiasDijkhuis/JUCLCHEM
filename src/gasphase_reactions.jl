@@ -1,7 +1,8 @@
 """
     get_twobody_rate_constant(α, β, γ, T_gas)
 
-Get the rate constant of a gas-phase twobody reaction.
+Get the rate constant of a gas-phase twobody reaction,
+using the Arrhenius-Kooij equation.
 
 ``k = \\alpha (T_{\\mathrm{gas}}/300)^\\beta e^{-\\gamma/T_{\\mathrm{gas}}}``"""
 function get_twobody_rate_constant(

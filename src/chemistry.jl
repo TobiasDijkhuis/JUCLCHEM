@@ -1,5 +1,3 @@
-using PhysicalConstants.CODATA2022: AtomicMassConstant, k_B, ħ
-
 include("constants.jl")
 include("gasphase_reactions.jl")
 include("grain_reactions.jl")

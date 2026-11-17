@@ -1,4 +1,4 @@
-using PhysicalConstants.CODATA2022: AtomicMassConstant, k_B
+using PhysicalConstants.CODATA2022: AtomicMassConstant, k_B, ħ
 
 include("constants.jl")
 
@@ -18,12 +18,45 @@ end
 """
     get_arrhenius_probability(E_reac, temperature)
 
-``e^{-E/T}``"""
+``P = e^{-E/T}``"""
 function get_arrhenius_probability(
     E_reac::AbstractFloat,
     temperature::AbstractFloat,
 )::AbstractFloat
     return exp(-E_reac / temperature)
+end
+
+"""
+    get_tunneling_probability(E_reac, μ_ij, barrier_width)
+
+``P = e^{\\frac{-2a}{\\hbar}\\sqrt{2\\mu_{ij}E_{\\mathrm{reac}}}}``"""
+function get_tunneling_probability(
+    E_reac::AbstractFloat,
+    μ_ij::AbstractFloat,
+    barrier_width::AbstractFloat,
+)::AbstractFloat
+    return exp(
+        -2 * barrier_width * 1.0e-10 / ħ * √(2 * μ_ij * AtomicMassConstant * E_reac * k_B),
+    )
+end
+
+"""
+    get_reaction_probability(E_reac, μ_ij, T_dust, barrier_width=1.4)
+
+Get the total reaction probability (including tunneling).
+
+Maximum of [`get_arrhenius_probability`](@ref) and [`get_tunneling_probability`](@ref)
+"""
+function get_reaction_probability(
+    E_reac::AbstractFloat,
+    μ_ij::AbstractFloat,
+    T_dust::AbstractFloat,
+    barrier_width::AbstractFloat = 1.4,
+)::AbstractFloat
+    return max(
+        get_tunneling_probability(E_reac, μ_ij, barrier_width),
+        get_arrhenius_probability(E_reac, T_dust),
+    )
 end
 
 """
@@ -40,7 +73,7 @@ function get_sticking_coefficient_Hollenbach_McKee(
 end
 
 """
-    get_factor_1(μ, ν, E_H2, T_dust)
+    _get_factor_1(μ, ν, E_H2, T_dust)
 
 The first term in equation 15 from Cazaux & Tielens, 2002.
 """
@@ -69,7 +102,7 @@ function _get_factor_2(
 end
 
 """
-    _get_ϵ(\nu, E_HC, E_S, E_HP, T_dust
+    _get_ϵ(ν, E_HC, E_S, E_HP, T_dust)
 
 Equation 16 from Cazaux & Tielens, 2002.
 """
@@ -99,7 +132,7 @@ const GRAIN_DATA = Base.ImmutableDict(
         "E_HC" => 3.0e4,
         "ν_H2" => 3.0e12,
         "ν_H" => 1.3e13,
-        "CROSS_SECTION" => 8.437e22,
+        "CROSS_SECTION" => 8.437e-22,
     ),
     "Gr" => Base.ImmutableDict(
         "μ" => 0.005,
@@ -109,7 +142,7 @@ const GRAIN_DATA = Base.ImmutableDict(
         "E_HC" => 3.0e4,
         "ν_H2" => 3.0e12,
         "ν_H" => 1.3e13,
-        "CROSS_SECTION" => 0.5,
+        "CROSS_SECTION" => 7.908e-22,
     ),
 )
 
@@ -138,37 +171,25 @@ function get_CT_H2_form_efficiency(
     sticking_coefficient = get_sticking_coefficient_Hollenbach_McKee(T_gas, T_dust)
 
     graphite_efficiency = get_formation_efficiency("Gr", T_dust)
-    graphite_rate = v_th *
+    graphite_rate = 0.5 *
+        v_th *
         sticking_coefficient *
         GRAIN_DATA["Gr"]["CROSS_SECTION"] *
         graphite_efficiency
     silicon_efficiency = get_formation_efficiency("Si", T_dust)
-    silicon_rate = v_th *
+    silicon_rate = 0.5 *
+        v_th *
         sticking_coefficient *
         GRAIN_DATA["Si"]["CROSS_SECTION"] *
         silicon_efficiency
 
-    return 0.5 * (graphite_rate + silicon_rate)
-end
-
-"""
-    get_tunneling_probability(E_reac, barrier_width, μ_ij)
-
-``e^{-2a/\\hbar\\sqrt{2\\mu_{ij}E_{\\mathrm{reac}}}}``"""
-function get_tunneling_probability(
-    E_reac::AbstractFloat,
-    barrier_width::AbstractFloat,
-    μ_ij::AbstractFloat,
-)::AbstractFloat
-    return exp(
-        -2 * barrier_width * 1.0e-10 / ħ * √(2 * μ_ij * AtomicMassConstant * E_reac * k_B),
-    )
+    return graphite_rate + silicon_rate
 end
 
 """
     get_ν_HH(E_bind, mass)
 
-``\\nu_{\\mathrm{HH}}=\\sqrt{2*SURFACE_SITE_DENSITY*E_{\\mathrm{bind}}/(π^2m)}``
+``\\nu_{\\mathrm{HH}}=\\sqrt{\\frac{2*SURFACE_SITE_DENSITY*E_{\\mathrm{bind}}}{π^2m}}``
 """
 function get_ν_HH(E_bind::AbstractFloat, mass::AbstractFloat)::AbstractFloat
     return √(
@@ -191,6 +212,50 @@ function get_thermal_desorption_rate_constant(
     return ν_des * get_arrhenius_probability(E_bind, T_dust)
 end
 
+"""
+    get_thermal_diffusion_rate_constant(E_diff, ν_diff, T_dust)
+
+The thermal diffusion rate constant,
+
+``\\nu_{\\mathrm{diff}}e^{-E_{\\mathrm{diff}}/T_{\\mathrm{dust}}}``
+"""
+function get_thermal_diffusion_rate_constant(
+    E_diff::AbstractFloat,
+    ν_diff::AbstractFloat,
+    T_dust::AbstractFloat,
+)::AbstractFloat
+    return ν_diff * get_arrhenius_probability(E_diff, T_dust)
+end
+
 function get_chemical_desorption_probability()
+    error("unimplemented")
+end
+
+function get_enthalpy_of_reaction()
+    error("unimplemented")
+end
+
+function get_langmuir_hinshelwood_rate_constant()
+    error("unimplemented")
+end
+
+"""
+    get_eley_rideal_rate_constant(freezeout_rate, γ, μ_ij, T_dust)
+
+Equation 25 from Vermarien et al, 2025.
+"""
+function get_eley_rideal_rate_constant(
+    freezeout_rate::AbstractFloat,
+    γ::AbstractFloat,
+    μ_ij::AbstractFloat,
+    T_dust::AbstractFloat,
+    total_surface_abundance::AbstractFloat,
+)::AbstractFloat
+    return freezeout_rate *
+        get_reaction_probability(γ, μ_ij, T_dust) /
+        total_surface_abundance
+end
+
+function get_crp_desorption_rate()
     error("unimplemented")
 end
