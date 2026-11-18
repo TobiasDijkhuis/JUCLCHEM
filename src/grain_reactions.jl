@@ -10,7 +10,7 @@ const H2_FLUX_CT = 1.0e-10
 
 ``v_{\\mathrm{th}}=\\sqrt{\\frac{8k_\\mathrm{B}T}{πm}}``
 """
-function get_thermal_velocity(mass::AbstractFloat, T::AbstractFloat)::AbstractFloat
+function get_thermal_velocity(mass::Real, T::Real)::Real
     thermal_vel = √(8 * k_B * T / (π * AtomicMassConstant * mass))
     return thermal_vel
 end
@@ -19,10 +19,7 @@ end
     get_arrhenius_probability(E_reac, temperature)
 
 ``P = e^{-E/T}``"""
-function get_arrhenius_probability(
-    E_reac::AbstractFloat,
-    temperature::AbstractFloat,
-)::AbstractFloat
+function get_arrhenius_probability(E_reac::Real, temperature::Real)::Real
     return exp(-E_reac / temperature)
 end
 
@@ -30,11 +27,7 @@ end
     get_tunneling_probability(E_reac, μ_ij, barrier_width)
 
 ``P = e^{\\frac{-2a}{\\hbar}\\sqrt{2\\mu_{ij}E_{\\mathrm{reac}}}}``"""
-function get_tunneling_probability(
-    E_reac::AbstractFloat,
-    μ_ij::AbstractFloat,
-    barrier_width::AbstractFloat,
-)::AbstractFloat
+function get_tunneling_probability(E_reac::Real, μ_ij::Real, barrier_width::Real)::Real
     return exp(
         -2 * barrier_width * 1.0e-10 / ħ * √(2 * μ_ij * AtomicMassConstant * E_reac * k_B),
     )
@@ -48,11 +41,11 @@ Get the total reaction probability (including tunneling).
 Maximum of [`get_arrhenius_probability`](@ref) and [`get_tunneling_probability`](@ref)
 """
 function get_reaction_probability(
-    E_reac::AbstractFloat,
-    μ_ij::AbstractFloat,
-    T_dust::AbstractFloat,
-    barrier_width::AbstractFloat = 1.4,
-)::AbstractFloat
+    E_reac::Real,
+    μ_ij::Real,
+    T_dust::Real,
+    barrier_width::Real = 1.4,
+)::Real
     return max(
         get_tunneling_probability(E_reac, μ_ij, barrier_width),
         get_arrhenius_probability(E_reac, T_dust),
@@ -64,10 +57,7 @@ end
 
 Equation 3.7 from Hollenbach & McKee 1979.
 """
-function get_sticking_coefficient_Hollenbach_McKee(
-    T_gas::AbstractFloat,
-    T_dust::AbstractFloat,
-)::AbstractFloat
+function get_sticking_coefficient_Hollenbach_McKee(T_gas::Real, T_dust::Real)::Real
     S = 1 / (1 + 0.04 * √(T_gas + T_dust) + 0.2 * T_gas / 100 + 0.08 * (T_gas / 100)^2)
     return S
 end
@@ -77,12 +67,7 @@ end
 
 The first term in equation 15 from Cazaux & Tielens, 2002.
 """
-function _get_factor_1(
-    μ::AbstractFloat,
-    ν::AbstractFloat,
-    E_H2::AbstractFloat,
-    T_dust::AbstractFloat,
-)::AbstractFloat
+function _get_factor_1(μ::Real, ν::Real, E_H2::Real, T_dust::Real)::Real
     return μ * H2_FLUX_CT / (2 * ν * get_arrhenius_probability(E_H2, T_dust))
 end
 
@@ -90,12 +75,7 @@ end
     _get_factor_2(E_HC, E_S, E_HP, T_dust)
 
 Equation 17 from Cazaux & Tielens, 2002."""
-function _get_factor_2(
-    E_HC::AbstractFloat,
-    E_S::AbstractFloat,
-    E_HP::AbstractFloat,
-    T_dust::AbstractFloat,
-)::AbstractFloat
+function _get_factor_2(E_HC::Real, E_S::Real, E_HP::Real, T_dust::Real)::Real
     return (1 + √((E_HC - E_S) / (E_HP - E_S)))^2 /
         4 *
         get_arrhenius_probability(E_S, T_dust)
@@ -106,13 +86,7 @@ end
 
 Equation 16 from Cazaux & Tielens, 2002.
 """
-function _get_ϵ(
-    ν::AbstractFloat,
-    E_HC::AbstractFloat,
-    E_S::AbstractFloat,
-    E_HP::AbstractFloat,
-    T_dust::AbstractFloat,
-)::AbstractFloat
+function _get_ϵ(ν::Real, E_HC::Real, E_S::Real, E_HP::Real, T_dust::Real)::Real
     return 1 /
         (
             1 +
@@ -146,10 +120,7 @@ const GRAIN_DATA = Base.ImmutableDict(
     ),
 )
 
-function get_formation_efficiency(
-    material::AbstractString,
-    T_dust::AbstractFloat,
-)::AbstractFloat
+function get_formation_efficiency(material::AbstractString, T_dust::Real)::Real
     μ = GRAIN_DATA[material]["μ"]
     E_H2 = GRAIN_DATA[material]["E_H2"]
     E_HC = GRAIN_DATA[material]["E_HC"]
@@ -163,10 +134,7 @@ function get_formation_efficiency(
     return ϵ / (1 + factor_1 + factor_2)
 end
 
-function get_CT_H2_form_efficiency(
-    T_gas::AbstractFloat,
-    T_dust::AbstractFloat,
-)::AbstractFloat
+function get_CT_H2_form_efficiency(T_gas::Real, T_dust::Real)::Real
     v_th = get_thermal_velocity(AtomicMassConstant, T_gas)
     sticking_coefficient = get_sticking_coefficient_Hollenbach_McKee(T_gas, T_dust)
 
@@ -191,7 +159,7 @@ end
 
 ``\\nu_{\\mathrm{HH}}=\\sqrt{\\frac{2*SURFACE_SITE_DENSITY*E_{\\mathrm{bind}}}{π^2m}}``
 """
-function get_ν_HH(E_bind::AbstractFloat, mass::AbstractFloat)::AbstractFloat
+function get_ν_HH(E_bind::Real, mass::Real)::Real
     return √(
         2 * GRAIN_SURFACE_SITE_DENSITY * E_bind * k_B / (mass * AtomicMassConstant * π^2)
     )
@@ -204,11 +172,7 @@ The thermal desorption rate constant,
 
 ``\\nu_{\\mathrm{des}}e^{-E_{\\mathrm{bind}}/T_{\\mathrm{dust}}}``
 """
-function get_thermal_desorption_rate_constant(
-    E_bind::AbstractFloat,
-    ν_des::AbstractFloat,
-    T_dust::AbstractFloat,
-)::AbstractFloat
+function get_thermal_desorption_rate_constant(E_bind::Real, ν_des::Real, T_dust::Real)::Real
     return ν_des * get_arrhenius_probability(E_bind, T_dust)
 end
 
@@ -219,11 +183,7 @@ The thermal diffusion rate constant,
 
 ``\\nu_{\\mathrm{diff}}e^{-E_{\\mathrm{diff}}/T_{\\mathrm{dust}}}``
 """
-function get_thermal_diffusion_rate_constant(
-    E_diff::AbstractFloat,
-    ν_diff::AbstractFloat,
-    T_dust::AbstractFloat,
-)::AbstractFloat
+function get_thermal_diffusion_rate_constant(E_diff::Real, ν_diff::Real, T_dust::Real)::Real
     return ν_diff * get_arrhenius_probability(E_diff, T_dust)
 end
 
@@ -245,12 +205,12 @@ end
 Equation 25 from Vermarien et al, 2025.
 """
 function get_eley_rideal_rate_constant(
-    freezeout_rate::AbstractFloat,
-    γ::AbstractFloat,
-    μ_ij::AbstractFloat,
-    T_dust::AbstractFloat,
-    total_surface_abundance::AbstractFloat,
-)::AbstractFloat
+    freezeout_rate::Real,
+    γ::Real,
+    μ_ij::Real,
+    T_dust::Real,
+    total_surface_abundance::Real,
+)::Real
     return freezeout_rate *
         get_reaction_probability(γ, μ_ij, T_dust) /
         total_surface_abundance

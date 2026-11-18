@@ -41,3 +41,6 @@ const NUM_SITES_PER_GRAIN = GRAIN_SURFACE_SITE_DENSITY * GRAIN_AREA
 
 """Conversion between Habing and Draine"""
 const HABING_PER_DRAINE = 1 / 1.7
+
+"""Minimum abundance."""
+const MIN_ABUNDANCE = 1.0e-30

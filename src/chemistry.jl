@@ -8,16 +8,12 @@ include("grain_reactions.jl")
 ``\\alpha(1+\\beta*1.671e-4/(r_{\\mathrm{grain}}T_{\\mathrm{gas}})*freeze_factor*v_{\\mathrm{th}}*GRAIN_CROSSSECTION_PER_H``
 """
 function get_freezeout_rate_constant(
-    α::AbstractFloat,
-    β::AbstractFloat,
-    mass::AbstractFloat,
-    T_gas::AbstractFloat,
-    freeze_factor::AbstractFloat = 1.0,
-)::AbstractFloat
-    if freeze_factor == 0
-        return 0
-    end
-
+    α::Real,
+    β::Real,
+    mass::Real,
+    T_gas::Real,
+    freeze_factor::Real = 1.0,
+)::Real
     thermal_vel = get_thermal_velocity(mass, T_gas)
     rate_constant = α *
         (1 + β * 16.71e-4 / (GRAIN_RADIUS * T_gas)) *
@@ -34,11 +30,7 @@ Sticking coefficient for freeze out taken from Chaabouni et al. 2012 A&A 538 Equ
 
 ``S_T = S_0(1+\\beta T_{\\mathrm{gas}}/T_{\\mathrm{crit}})/((1+T_{\\mathrm{gas}}/T_{\\mathrm{crit}})^\\beta)``
 """
-function get_sticking_coefficient(
-    S_0::AbstractFloat,
-    T_critical::AbstractFloat,
-    T_gas::AbstractFloat,
-)::AbstractFloat
+function get_sticking_coefficient(S_0::Real, T_critical::Real, T_gas::Real)::Real
     β = 2.5
     temperature_ratio = T_gas / T_critical
     sticking_coefficient = S_0 * (1 + β * temperature_ratio) / ((1 + temperature_ratio)^β)
@@ -50,7 +42,7 @@ end
 
 Calculated by ``N/(N_{\\mathrm{sites-per-grain}}(N_{\\mathrm{dust}}/N_{\\mathrm{gas}})``
 """
-function get_number_of_monolayers(abundance::AbstractFloat)::AbstractFloat
+function get_number_of_monolayers(abundance::Real)::Real
     return abundance / (NUM_SITES_PER_GRAIN * GAS_DUST_NUMBER_DENSITY_RATIO)
 end
 
@@ -59,9 +51,9 @@ end
 
 """
 function get_total_elemental_abuncance(
-    abundances::AbstractVector{AbstractFloat},
+    abundances::AbstractVector{Real},
     elements_per_species::AbstractMatrix{Int},
-)::AbstractArray{AbstractFloat}
+)::AbstractArray{Real}
     return elements_per_species * abundances
 end
 
