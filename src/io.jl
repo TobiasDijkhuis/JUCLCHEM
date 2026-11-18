@@ -1,6 +1,3 @@
-include("reaction.jl")
-include("species.jl")
-
 """
     initialize_species(row)
 

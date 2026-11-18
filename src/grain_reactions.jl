@@ -1,7 +1,5 @@
 using PhysicalConstants.CODATA2022: AtomicMassConstant, k_B, ħ
 
-include("constants.jl")
-
 const H2_FLUX_CT = 1.0e-10
 
 """

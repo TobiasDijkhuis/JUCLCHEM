@@ -5,7 +5,13 @@ using SymbolicUtils
 using DifferentialEquations
 
 include("constants.jl")
+include("grain_reactions.jl")
+include("gasphase_reactions.jl")
+include("reaction.jl")
+include("species.jl")
 include("network.jl")
+include("chemistry.jl")
+include("io.jl")
 
 function create_initial_conditions(species::AbstractVector)::AbstractDict
     abundances = Dict(spec => MIN_ABUNDANCE for spec in values(species))

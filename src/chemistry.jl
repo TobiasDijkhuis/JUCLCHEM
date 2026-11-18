@@ -1,7 +1,3 @@
-include("constants.jl")
-include("gasphase_reactions.jl")
-include("grain_reactions.jl")
-
 """
     get_freezeout_rate_constant(α, β, mass, T_gas, freeze_factor=1)
 

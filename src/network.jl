@@ -2,9 +2,6 @@ using CSV
 using Catalyst
 using Symbolics
 
-include("chemistry.jl")
-include("io.jl")
-
 function collapse(names::AbstractVector{<:AbstractString}, sp::AbstractDict)
     isempty(names) && return nothing, nothing
     u = unique(names)

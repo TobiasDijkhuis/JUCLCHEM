@@ -34,25 +34,6 @@ const ReactionInfo = @NamedTuple begin
     γ::Real
 end
 
-function initialize_reaction(row::CSV.Row)::ReactionInfo
-    reaction_type = _get_reaction_type([
-        row["REACTANT 1"],
-        row["REACTANT 2"],
-        row["REACTANT 3"],
-    ])
-    return ReactionInfo((
-        r1 = row["REACTANT 1"],
-        r2 = row["REACTANT 2"],
-        type = reaction_type,
-        p1 = row["PRODUCT 1"],
-        p2 = row["PRODUCT 2"],
-        p3 = row["PRODUCT 3"],
-        α = row.ALPHA,
-        β = row.BETA,
-        γ = row.GAMMA,
-    ))
-end
-
 const REACTION_TYPE_LOOKUP = Dict(string(x) => x for x in instances(ReactionType))
 
 function _get_reaction_type(reactants::Vector{String})::ReactionType
