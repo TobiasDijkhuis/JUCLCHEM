@@ -1,12 +1,5 @@
 using Test: @test, @testset
-using JUCLCHEM:
-    get_pure_reactants,
-    ReactionInfo,
-    ReactionType,
-    TWOBODY,
-    PHOTON,
-    CRP,
-    _get_reaction_type
+using JUCLCHEM: get_pure_reactants, ReactionInfo, TWOBODY, PHOTON, CRP, _get_reaction_type
 using Catalyst
 
 @testset "get_pure_reactants" begin
