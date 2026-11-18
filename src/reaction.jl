@@ -37,11 +37,17 @@ end
 const REACTION_TYPE_LOOKUP = Dict(string(x) => x for x in instances(ReactionType))
 
 function _get_reaction_type(reactants::Vector{String})::ReactionType
+    if length(reactants) ≠ 3
+        throw(ArgumentError(
+            "reactants should have length 3, but had length $(length(reactants))",
+        ))
+    end
     if !isempty(reactants[end]) && reactants[end] ≠ "NAN"
         rt = get(REACTION_TYPE_LOOKUP, reactants[end], nothing)
         if isnothing(rt)
-            error("Unknown reaction type $(reactants[end])")
+            throw(KeyError("Unknown reaction type $(reactants[end])"))
         end
+        return rt
     end
     for name in (reactants[end], reactants[end - 1])
         rt = get(REACTION_TYPE_LOOKUP, name, nothing)

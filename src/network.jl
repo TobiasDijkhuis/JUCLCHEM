@@ -8,20 +8,20 @@ function collapse(names::AbstractVector{<:AbstractString}, sp::AbstractDict)
     return [sp[n] for n in u], [count(==(n), names) for n in u]
 end
 
-function get_symbolic_rate(reaction_type::ReactionType, idx::Int, P)::Union{
+function get_symbolic_rate(reaction_type::ReactionType, idx::Int, P::NamedTuple)::Union{
     Symbolics.Num,
     Nothing,
 }
     if reaction_type == TWOBODY
-        rate = get_twobody_rate_constant(P.α[idx], P.β[idx], P.γ[idx], P.T_gas)
+        return get_twobody_rate_constant(P.α[idx], P.β[idx], P.γ[idx], P.T_gas)
     elseif reaction_type == IONOPOL1
-        rate = get_ionopol1_rate_constant(P.α[idx], P.β[idx], P.γ[idx], P.T_gas)
+        return get_ionopol1_rate_constant(P.α[idx], P.β[idx], P.γ[idx], P.T_gas)
     elseif reaction_type == IONOPOL2
-        rate = get_ionopol2_rate_constant(P.α[idx], P.β[idx], P.γ[idx], P.T_gas)
+        return get_ionopol2_rate_constant(P.α[idx], P.β[idx], P.γ[idx], P.T_gas)
     elseif reaction_type == PHOTON
-        rate = get_photo_rate_constant(P.α[idx], P.β[idx], P.radfield, P.A_V)
+        return get_photo_rate_constant(P.α[idx], P.β[idx], P.radfield, P.A_V)
     elseif reaction_type == CRPHOT
-        rate = get_crp_photo_rate_constant(
+        return get_crp_photo_rate_constant(
             P.α[idx],
             P.β[idx],
             P.γ[idx],
@@ -31,15 +31,15 @@ function get_symbolic_rate(reaction_type::ReactionType, idx::Int, P)::Union{
         )
     else
         return nothing
-        # throw("Unimplemented reaction type $(info.type)")
     end
-    return rate
 end
 
-function create_catalyst_reaction(info::ReactionInfo, idx::Int, sp, P)::Union{
-    Reaction,
-    Nothing,
-}
+function create_catalyst_reaction(
+    info::ReactionInfo,
+    idx::Int,
+    sp::Dict{String, Num},
+    P::NamedTuple,
+)::Union{Reaction, Nothing}
     rate = get_symbolic_rate(info.type, idx, P)
     if isnothing(rate)
         return nothing
@@ -59,19 +59,19 @@ function create_reaction_system(
     @debug "Initialing reaction system with $(length(reactions_list)) reactions and $(length(species_list)) species."
 
     t = default_t()
-    @parameters begin
+    ps = @parameters begin
         α[1:length(reactions_list)] = [r.α for r in reactions_list]
         β[1:length(reactions_list)] = [r.β for r in reactions_list]
         γ[1:length(reactions_list)] = [r.γ for r in reactions_list]
-        A_V = 1.0
-        T_gas = 10.0
-        T_dust = 10.0
-        n_H = 1.0e3
-        radfield = 1.0
-        ζ = 1.0
-        ω_dust = DEFAULT_ω_DUST
+        A_V
+        T_gas
+        T_dust
+        n_H
+        radfield
+        ζ
+        ω_dust
     end
-    P = (; α, β, γ, A_V, T_gas, T_dust, n_H, radfield, ζ, ω_dust)
+    P = NamedTuple(Symbolics.getname(p) => p for p in ps)
 
     species_symbols = [only(@species $(Symbol(s.name))(t)) for s in species_list]
     @debug "Initialized $(length(species_symbols)) symbolic species"
@@ -87,13 +87,8 @@ function create_reaction_system(
     )
     @debug "Initialized $(length(rxs)) symbolic reactions."
 
-    @named network = ReactionSystem(
-        rxs,
-        t,
-        species_symbols,
-        [A_V, T_gas, T_dust, n_H, radfield, ζ, α, β, γ, ω_dust],
-    )
+    @named network = ReactionSystem(rxs, t, species_symbols, collect(values(P)))
 
-    @debug "Initialized reaction system has $(numspecies(network)) species and $(numreactions(network)) reactions"
+    @debug "Initialized reaction system has $(numspecies(network)) species, $(numreactions(network)) reactions and $(numparams(network)) parameters"
     return complete(network)
 end
