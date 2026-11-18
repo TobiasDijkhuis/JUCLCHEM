@@ -40,7 +40,7 @@ function _get_reaction_type(reactants::Vector{String})::ReactionType
     if !isempty(reactants[end]) && reactants[end] ≠ "NAN"
         rt = get(REACTION_TYPE_LOOKUP, reactants[end], nothing)
         if isnothing(rt)
-            error("Unknown reaction type $rt")
+            error("Unknown reaction type $(reactants[end])")
         end
     end
     for name in (reactants[end], reactants[end - 1])

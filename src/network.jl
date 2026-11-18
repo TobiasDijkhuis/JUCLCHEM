@@ -27,7 +27,7 @@ function get_symbolic_rate(reaction_type::ReactionType, idx::Int, P)::Union{
             P.γ[idx],
             P.ω_dust,
             P.ζ,
-            T_gas,
+            P.T_gas,
         )
     else
         return nothing

@@ -1,0 +1,5 @@
+[deps]
+Catalyst = "479239e8-5488-4da2-87a7-35f2df7eef83"
+JUCLCHEM = "1cef3fa9-e8f6-4710-aaef-3b323d294f4f"
+Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
