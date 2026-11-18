@@ -1,4 +1,15 @@
-using PhysicalConstants.CODATA2022: AtomicMassConstant
+using PhysicalConstants.CODATA2022: AtomicMassConstant, k_B, ħ
+using Unitful
+
+const AMU_SI = ustrip(u"kg", AtomicMassConstant)
+const K_B_SI = ustrip(u"J/K", k_B)
+const ħ_SI = ustrip(u"J*s", ħ)
+
+#Grain area per h nuclei, values taken from Cazaux & Tielens 2004 via UCL-PDR to match H2 formation rate (in m^2)
+#
+# Maybe replace by actual calculation of crossection from grain radius?
+const GRAIN_CROSSSECTION_PER_H = 0.5 * (7.908e-26 + 8.473e-26)
+const GRAIN_SURFACEAREA_PER_H = 4.0 * GRAIN_CROSSSECTION_PER_H
 
 """Number of seconds in one year."""
 const SECONDS_PER_YEAR = 60 * 60 * 24 * 365
@@ -30,8 +41,7 @@ const GAS_DUST_MASS_DENSITY_RATIO = 100.0
 """``N_{\\mathrm{gas}}/N_{\\mathrm{dust}}``
 
 Note that this is defined as the reciprocal as it is in UCLCHEM."""
-const GAS_DUST_NUMBER_DENSITY_RATIO = AtomicMassConstant /
-    (GRAIN_MASS * GAS_DUST_MASS_DENSITY_RATIO)
+const GAS_DUST_NUMBER_DENSITY_RATIO = AMU_SI / (GRAIN_MASS * GAS_DUST_MASS_DENSITY_RATIO)
 
 """Number of sites on grain surface (m``^{-1}``)"""
 const GRAIN_SURFACE_SITE_DENSITY = 1.5e19

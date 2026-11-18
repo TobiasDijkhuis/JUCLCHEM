@@ -1,7 +1,7 @@
 """
     get_freezeout_rate_constant(α, β, mass, T_gas, freeze_factor=1)
 
-``\\alpha(1+\\beta*1.671e-4/(r_{\\mathrm{grain}}T_{\\mathrm{gas}})*freeze_factor*v_{\\mathrm{th}}*GRAIN_CROSSSECTION_PER_H``
+``\\alpha(1+\\beta*16.71\\times 10^{-4}/(r_{\\mathrm{grain}}T_{\\mathrm{gas}})*freeze_factor*v_{\\mathrm{th}}*GRAIN_CROSSSECTION_PER_H``
 """
 function get_freezeout_rate_constant(
     α::Real,
@@ -70,4 +70,15 @@ function construct_elements_per_species_matrix(
         end
     end
     return element_matrix
+end
+
+"""
+    get_reduced_mass(m_1, m_2)
+
+Get the reduced mass of two species.
+
+``μ=\\frac{m_1m_2}{m_1+m_2}``
+"""
+function get_reduced_mass(m_1::Real, m_2::Real)::Real
+    return (m_1 * m_2) / (m_1 + m_2)
 end

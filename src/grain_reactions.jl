@@ -1,5 +1,3 @@
-using PhysicalConstants.CODATA2022: AtomicMassConstant, k_B, ħ
-
 const H2_FLUX_CT = 1.0e-10
 
 """
@@ -9,7 +7,7 @@ const H2_FLUX_CT = 1.0e-10
 ``v_{\\mathrm{th}}=\\sqrt{\\frac{8k_\\mathrm{B}T}{πm}}``
 """
 function get_thermal_velocity(mass::Real, T::Real)::Real
-    thermal_vel = √(8 * k_B * T / (π * AtomicMassConstant * mass))
+    thermal_vel = √(8 * K_B_SI * T / (π * AMU_SI * mass))
     return thermal_vel
 end
 
@@ -26,9 +24,7 @@ end
 
 ``P = e^{\\frac{-2a}{\\hbar}\\sqrt{2\\mu_{ij}E_{\\mathrm{reac}}}}``"""
 function get_tunneling_probability(E_reac::Real, μ_ij::Real, barrier_width::Real)::Real
-    return exp(
-        -2 * barrier_width * 1.0e-10 / ħ * √(2 * μ_ij * AtomicMassConstant * E_reac * k_B),
-    )
+    return exp(-2 * barrier_width * 1.0e-10 / ħ_SI * √(2 * μ_ij * AMU_SI * E_reac * K_B_SI))
 end
 
 """
@@ -104,7 +100,7 @@ const GRAIN_DATA = Base.ImmutableDict(
         "E_HC" => 3.0e4,
         "ν_H2" => 3.0e12,
         "ν_H" => 1.3e13,
-        "CROSS_SECTION" => 8.437e-22,
+        "CROSS_SECTION" => 8.437e-26,
     ),
     "Gr" => Base.ImmutableDict(
         "μ" => 0.005,
@@ -114,7 +110,7 @@ const GRAIN_DATA = Base.ImmutableDict(
         "E_HC" => 3.0e4,
         "ν_H2" => 3.0e12,
         "ν_H" => 1.3e13,
-        "CROSS_SECTION" => 7.908e-22,
+        "CROSS_SECTION" => 7.908e-26,
     ),
 )
 
@@ -158,9 +154,7 @@ end
 ``\\nu_{\\mathrm{HH}}=\\sqrt{\\frac{2*SURFACE_SITE_DENSITY*E_{\\mathrm{bind}}}{π^2m}}``
 """
 function get_ν_HH(E_bind::Real, mass::Real)::Real
-    return √(
-        2 * GRAIN_SURFACE_SITE_DENSITY * E_bind * k_B / (mass * AtomicMassConstant * π^2)
-    )
+    return √(2 * GRAIN_SURFACE_SITE_DENSITY * E_bind * K_B_SI / (mass * AMU_SI * π^2))
 end
 
 """
@@ -193,21 +187,54 @@ function get_enthalpy_of_reaction()
     error("unimplemented")
 end
 
-function get_langmuir_hinshelwood_rate_constant()
-    error("unimplemented")
+"""
+    get_langmuir_hinshelwood_rate_constant(E_reac, μ_ij, T_dust, E_bind_i, E_bind_j, E_diff_i, E_diff_j, mass_i, mass_j, barrier_width=1.4)
+
+Equation 21 from Vermarien et al, 2026.
+"""
+function get_langmuir_hinshelwood_rate_constant(
+    E_reac::Real,
+    T_dust::Real,
+    E_bind_i::Real,
+    E_bind_j::Real,
+    E_diff_i::Real,
+    E_diff_j::Real,
+    mass_i::Real,
+    mass_j::Real,
+    μ_ij::Union{Real, Missing} = missing,
+    barrier_width::Real = 1.4,
+)::Real
+    if ismissing(μ_ij)
+        μ_ij = get_reduced_mass(mass_i, mass_j)
+    end
+    ν_HH_i = get_ν_HH(E_bind_i, mass_i)
+    k_diff_i = get_thermal_diffusion_rate_constant(E_diff_i, ν_HH_i, T_dust)
+    k_des_i = get_thermal_desorption_rate_constant(E_bind_i, ν_HH_i, T_dust)
+
+    ν_HH_j = get_ν_HH(E_bind_j, mass_j)
+    k_diff_j = get_thermal_diffusion_rate_constant(E_diff_j, ν_HH_j, T_dust)
+    k_des_j = get_thermal_desorption_rate_constant(E_bind_j, ν_HH_j, T_dust)
+
+    P = get_reaction_probability(E_reac, μ_ij, T_dust, barrier_width)
+    κ_ij = max(ν_HH_i, ν_HH_j) * P
+
+    f_comp = κ_ij / (κ_ij + k_diff_i + k_des_i + k_diff_j + k_des_j)
+
+    # Should maybe be scaled some more?
+    return f_comp * (k_diff_i + k_diff_j)
 end
 
 """
     get_eley_rideal_rate_constant(freezeout_rate, γ, μ_ij, T_dust)
 
-Equation 25 from Vermarien et al, 2025.
+Equation 25 from Vermarien et al, 2026.
 """
 function get_eley_rideal_rate_constant(
     freezeout_rate::Real,
     γ::Real,
-    μ_ij::Real,
     T_dust::Real,
     total_surface_abundance::Real,
+    μ_ij::Real,
 )::Real
     return freezeout_rate *
         get_reaction_probability(γ, μ_ij, T_dust) /

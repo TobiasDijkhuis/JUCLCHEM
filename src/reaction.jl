@@ -61,6 +61,12 @@ function _get_reaction_type(reactants::Vector{String})::ReactionType
     return TWOBODY
 end
 
+function collapse(names::AbstractVector{<:AbstractString}, sp::AbstractDict)
+    isempty(names) && return nothing, nothing
+    u = unique(names)
+    return [sp[n] for n in u], [count(==(n), names) for n in u]
+end
+
 """
     get_pure_reactants(r)
 
