@@ -7,7 +7,6 @@ makedocs(
     sitename = "JUCLCHEM",
     authors = "Tobias Dijkhuis",
     pages = pages,
-    modules = [JUCLCHEM],
     clean = true,
     pagesonly = true,
 )

@@ -36,6 +36,11 @@ end
 
 const REACTION_TYPE_LOOKUP = Dict(string(x) => x for x in instances(ReactionType))
 
+"""
+    _get_reaction_type(reactants)
+
+Get the reaction type from a list of reactants.
+"""
 function _get_reaction_type(reactants::Vector{String})::ReactionType
     if length(reactants) ≠ 3
         throw(ArgumentError(
@@ -56,6 +61,11 @@ function _get_reaction_type(reactants::Vector{String})::ReactionType
     return TWOBODY
 end
 
+"""
+    get_pure_reactants(r)
+
+
+Get the pure reactants (without 'NAN' or reaction types)"""
 function get_pure_reactants(r::ReactionInfo)::AbstractVector{AbstractString}
     return [
         x
@@ -64,6 +74,11 @@ function get_pure_reactants(r::ReactionInfo)::AbstractVector{AbstractString}
     ]
 end
 
+"""
+    get_pure_products(r)
+
+
+Get the pure products (without 'NAN')"""
 function get_pure_products(r::ReactionInfo)::AbstractVector{AbstractString}
     return [
         x
