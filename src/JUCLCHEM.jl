@@ -65,7 +65,7 @@ function create_odeproblem(
     pmap = Dict(getproperty(system, k) => v for (k, v) in pm)
 
     @debug "Creating ODEProblem"
-    return ODEProblem(ode_sys, merge(u0, pmap), tspan)
+    return ODEProblem(ode_sys, merge(u0, pmap), tspan; sparse = true)
 end
 
 const DEFAULT_SAVE_T = collect(logrange(
