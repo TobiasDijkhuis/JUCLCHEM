@@ -149,10 +149,6 @@ function create_reaction_system(
     end
 
     species_symbols = [only(@species $(Symbol(s.name))(t)) for s in species_list]
-    @observables begin
-        Symbol("E-") ~ sum(filter(is_positive_ion, (s.name for s in species_list)))
-    end
-
     species_indices = Dict(s.name => i for (i, s) in enumerate(species_list))
     masses = Dict(s.name => s.mass for s in species_list)
     masses["E-"] = 1.0 # Use mass 1 for E-, otherwise get mass 0 in freeze-out rate.

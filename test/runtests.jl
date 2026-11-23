@@ -39,6 +39,8 @@ using SymbolicIndexingInterface
             α = 0,
             β = 0,
             γ = 0,
+            T_min = missing,
+            T_max = missing,
         ))
     end
     @test get_pure_reactants(make_reaction_info(r1 = "C", r2 = "O")) == ["C", "O"]
@@ -62,6 +64,8 @@ let
             "ALPHA" => 0,
             "BETA" => 0,
             "GAMMA" => 0,
+            "T_MIN" => 0,
+            "T_MAX" => 10000,
         )
     end
     function make_dummy_info(r1, r2, type, p1, p2, p3)
@@ -75,6 +79,8 @@ let
             α = 0,
             β = 0,
             γ = 0,
+            T_min = 0,
+            T_max = 10000,
         ))
     end
     @testset "initialize_reaction $row" for (row, expected_info) in [
@@ -119,6 +125,8 @@ let
             α = 0,
             β = 0,
             γ = 0,
+            T_min = missing,
+            T_max = missing,
         ))
     end
     ps = @parameters begin
@@ -190,6 +198,8 @@ let
             α = 0,
             β = 0,
             γ = 0,
+            T_min = missing,
+            T_max = missing,
         ))
     end
     idx = 1
@@ -250,6 +260,8 @@ end
             α = 1.0,
             β = 1.0,
             γ = 1.0,
+            T_min = missing,
+            T_max = missing,
         ))
     end
     species_infos = [make_dummy_species(name) for name in ["C", "O", "CO"]]
@@ -296,8 +308,6 @@ end
 
     du = similar(odeprob.u0)
     odeprob.f(du, odeprob.u0, odeprob.p, 0.0)
-
-    print(observables(system))
 
     @test all(isfinite, du)
 

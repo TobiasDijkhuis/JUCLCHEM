@@ -3,4 +3,3 @@ safe = true
 
 [project]
 entry-points = ['src/JUCLCHEM.jl']
-
