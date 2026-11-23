@@ -1,3 +1,6 @@
 [deps]
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
 JUCLCHEM = "1cef3fa9-e8f6-4710-aaef-3b323d294f4f"
+
+[compat]
+Documenter = "1.20.0"
