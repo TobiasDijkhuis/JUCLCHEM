@@ -144,10 +144,6 @@ function create_reaction_system(
     end
     P = NamedTuple(Symbolics.getname(p) => p for p in ps)
 
-    function is_positive_ion(name)::Bool
-        return endswith(name, "+")
-    end
-
     species_symbols = [only(@species $(Symbol(s.name))(t)) for s in species_list]
     species_indices = Dict(s.name => i for (i, s) in enumerate(species_list))
     masses = Dict(s.name => s.mass for s in species_list)

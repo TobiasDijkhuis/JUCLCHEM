@@ -102,11 +102,16 @@ function create_odeproblem(
     )
 end
 
-const DEFAULT_SAVE_T = collect(logrange(
-    1.0e-7 * SECONDS_PER_YEAR,
-    1.0e6 * SECONDS_PER_YEAR,
-    100,
-))
+const DEFAULT_SAVE_T_COUNT = 100
+
+const DEFAULT_SAVE_T = [
+    0.0,
+    collect(logrange(
+        1.0e-7 * SECONDS_PER_YEAR,
+        1.0e6 * SECONDS_PER_YEAR,
+        DEFAULT_SAVE_T_COUNT - 1,
+    )),
+]
 
 function simulate(
     oprob::ODEProblem,
