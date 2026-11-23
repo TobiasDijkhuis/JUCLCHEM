@@ -23,15 +23,17 @@
 end
 
 const ReactionInfo = @NamedTuple begin
-    r1::AbstractString
-    r2::Union{AbstractString, Missing}
+    r1::String
+    r2::Union{String, Missing}
     type::ReactionType
-    p1::Union{AbstractString, Missing}
-    p2::Union{AbstractString, Missing}
-    p3::Union{AbstractString, Missing}
-    α::Real
-    β::Real
-    γ::Real
+    p1::Union{String, Missing}
+    p2::Union{String, Missing}
+    p3::Union{String, Missing}
+    α
+    β
+    γ
+    T_min::Union{Missing, Any}
+    T_max::Union{Missing, Any}
 end
 
 const REACTION_TYPE_LOOKUP = Dict(string(x) => x for x in instances(ReactionType))
@@ -41,7 +43,7 @@ const REACTION_TYPE_LOOKUP = Dict(string(x) => x for x in instances(ReactionType
 
 Get the reaction type from a list of reactants.
 """
-function _get_reaction_type(reactants::Vector{String})::ReactionType
+function _get_reaction_type(reactants::AbstractVector{String})::ReactionType
     if length(reactants) ≠ 3
         throw(ArgumentError(
             "reactants should have length 3, but had length $(length(reactants))",
@@ -61,10 +63,17 @@ function _get_reaction_type(reactants::Vector{String})::ReactionType
     return TWOBODY
 end
 
-function collapse(names::AbstractVector{<:AbstractString}, sp::AbstractDict)
+function collapse(names::AbstractVector{String}, sp::Dict)
     isempty(names) && return nothing, nothing
     u = unique(names)
     return [sp[n] for n in u], [count(==(n), names) for n in u]
+end
+
+function _is_real_species(field)::Bool
+    return !ismissing(field) &&
+        !isempty(field) &&
+        field ≠ "NAN" &&
+        !haskey(REACTION_TYPE_LOOKUP, field)
 end
 
 """
@@ -72,12 +81,8 @@ end
 
 
 Get the pure reactants (without 'NAN' or reaction types)"""
-function get_pure_reactants(r::ReactionInfo)::AbstractVector{AbstractString}
-    return [
-        x
-        for x in (r.r1, r.r2)
-        if !ismissing(x) && x ≠ "NAN" && !haskey(REACTION_TYPE_LOOKUP, x)
-    ]
+function get_pure_reactants(r::ReactionInfo)::AbstractVector{String}
+    return [x for x in (r.r1, r.r2) if _is_real_species(x)]
 end
 
 """
@@ -85,10 +90,6 @@ end
 
 
 Get the pure products (without 'NAN')"""
-function get_pure_products(r::ReactionInfo)::AbstractVector{AbstractString}
-    return [
-        x
-        for x in (r.p1, r.p2, r.p3)
-        if !ismissing(x) && x ≠ "NAN" && !haskey(REACTION_TYPE_LOOKUP, x)
-    ]
+function get_pure_products(r::ReactionInfo)::AbstractVector{String}
+    return [x for x in (r.p1, r.p2, r.p3) if _is_real_species(x)]
 end

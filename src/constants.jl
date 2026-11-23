@@ -3,7 +3,7 @@ using Unitful
 
 const AMU_SI = ustrip(u"kg", AtomicMassConstant)
 const K_B_SI = ustrip(u"J/K", k_B)
-const ħ_SI = ustrip(u"J*s", ħ)
+const ħ_SI = ustrip(u"J*s/rad", ħ)
 
 #Grain area per h nuclei, values taken from Cazaux & Tielens 2004 via UCL-PDR to match H2 formation rate (in m^2)
 #

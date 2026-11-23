@@ -3,16 +3,10 @@
 
 ``\\alpha(1+\\beta*16.71\\times 10^{-4}/(r_{\\mathrm{grain}}T_{\\mathrm{gas}})*freeze_factor*v_{\\mathrm{th}}*GRAIN_CROSSSECTION_PER_H``
 """
-function get_freezeout_rate_constant(
-    α::Real,
-    β::Real,
-    mass::Real,
-    T_gas::Real,
-    freeze_factor::Real = 1.0,
-)::Real
+function get_freezeout_rate_constant(α, β, mass, T_gas, freeze_factor = 1.0)
     thermal_vel = get_thermal_velocity(mass, T_gas)
     rate_constant = α *
-        (1 + β * 16.71e-4 / (GRAIN_RADIUS * T_gas)) *
+        (1.0 + β * 16.71e-4 / (GRAIN_RADIUS * T_gas)) *
         freeze_factor *
         thermal_vel *
         GRAIN_CROSSSECTION_PER_H
@@ -26,10 +20,12 @@ Sticking coefficient for freeze out taken from Chaabouni et al. 2012 A&A 538 Equ
 
 ``S_T = S_0(1+\\beta T_{\\mathrm{gas}}/T_{\\mathrm{crit}})/((1+T_{\\mathrm{gas}}/T_{\\mathrm{crit}})^\\beta)``
 """
-function get_sticking_coefficient(S_0::Real, T_critical::Real, T_gas::Real)::Real
+function get_sticking_coefficient(S_0, T_critical, T_gas)
     β = 2.5
     temperature_ratio = T_gas / T_critical
-    sticking_coefficient = S_0 * (1 + β * temperature_ratio) / ((1 + temperature_ratio)^β)
+    sticking_coefficient = S_0 *
+        (1.0 + β * temperature_ratio) /
+        ((1.0 + temperature_ratio)^β)
     return sticking_coefficient
 end
 
@@ -38,7 +34,7 @@ end
 
 Calculated by ``N/(N_{\\mathrm{sites-per-grain}}(N_{\\mathrm{dust}}/N_{\\mathrm{gas}})``
 """
-function get_number_of_monolayers(abundance::Real)::Real
+function get_number_of_monolayers(abundance)
     return abundance / (NUM_SITES_PER_GRAIN * GAS_DUST_NUMBER_DENSITY_RATIO)
 end
 
@@ -47,9 +43,9 @@ end
 
 """
 function get_total_elemental_abuncance(
-    abundances::AbstractVector{Real},
-    elements_per_species::AbstractMatrix{Int},
-)::AbstractArray{Real}
+    abundances::AbstractVector,
+    elements_per_species::Matrix{Int},
+)::AbstractVector
     return elements_per_species * abundances
 end
 
@@ -58,8 +54,8 @@ end
 
 """
 function construct_elements_per_species_matrix(
-    constituent_dicts::AbstractVector{AbstractDict{AbstractString, Int}},
-    elements::AbstractVector{AbstractString},
+    constituent_dicts::AbstractVector{Dict{String, Int}},
+    elements::AbstractVector{String},
 )::AbstractMatrix{Int}
     num_species = length(constituent_dicts)
     num_elements = length(elements)
@@ -79,6 +75,6 @@ Get the reduced mass of two species.
 
 ``μ=\\frac{m_1m_2}{m_1+m_2}``
 """
-function get_reduced_mass(m_1::Real, m_2::Real)::Real
+function get_reduced_mass(m_1, m_2)
     return (m_1 * m_2) / (m_1 + m_2)
 end

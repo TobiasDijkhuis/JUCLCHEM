@@ -16,31 +16,38 @@ function get_symbolic_rate(
     species_indices::Dict{String, Int},
 )::Union{Symbolics.Num, Nothing}
     reaction_type = reaction_info.type
+    i1 = species_indices[reaction_info.r1]
+    if !ismissing(reaction_info.r2)
+        i2 = species_indices[reaction_info.r2]
+    end
     if reaction_type == TWOBODY
         return get_twobody_rate_constant(
             P.α[reaction_idx],
             P.β[reaction_idx],
             P.γ[reaction_idx],
             P.T_gas,
-        )
+        ) *
+            P.n_H
     elseif reaction_type == IONOPOL1
         return get_ionopol1_rate_constant(
             P.α[reaction_idx],
             P.β[reaction_idx],
             P.γ[reaction_idx],
             P.T_gas,
-        )
+        ) *
+            P.n_H
     elseif reaction_type == IONOPOL2
         return get_ionopol2_rate_constant(
             P.α[reaction_idx],
             P.β[reaction_idx],
             P.γ[reaction_idx],
             P.T_gas,
-        )
+        ) *
+            P.n_H
     elseif reaction_type == PHOTON
         return get_photo_rate_constant(
             P.α[reaction_idx],
-            P.β[reaction_idx],
+            P.γ[reaction_idx],
             P.radfield,
             P.A_V,
         )
@@ -53,9 +60,9 @@ function get_symbolic_rate(
             P.ζ,
             P.T_gas,
         )
+    elseif reaction_type == CRP
+        return get_crp_rate_constant(P.α[reaction_idx], P.ζ)
     elseif reaction_type == LH
-        i1 = species_indices[reaction_info.r1]
-        i2 = species_indices[reaction_info.r2]
         return P.α[reaction_idx] *
             get_langmuir_hinshelwood_rate_constant(
                 P.γ[reaction_idx],
@@ -74,19 +81,30 @@ function get_symbolic_rate(
             masses[reaction_info.r1],
             P.T_gas,
             P.freeze_factor,
+        ) *
+            P.n_H^2
+    elseif reaction_type == THERM
+        ν_des = get_ν_HH(P.E_bind[i1], masses[reaction_info.r1])
+        return get_thermal_desorption_rate_constant(
+            P.α[reaction_idx],
+            P.E_bind[i1],
+            ν_des,
+            P.T_dust,
         )
+    elseif reaction_type == H2FORM
+        return get_CT_H2_form_efficiency(P.T_gas, P.T_dust)
     else
         return nothing
     end
 end
 
 function create_catalyst_reaction(
-    info::ReactionInfo,
-    reaction_idx::Int,
-    sp::Dict{String, Num},
-    P::NamedTuple,
-    species_masses::Dict{String, Float64},
-    species_indices::Dict{String, Int},
+    info,
+    reaction_idx,
+    sp,
+    P,
+    species_masses,
+    species_indices,
 )::Union{Reaction, Nothing}
     rate = get_symbolic_rate(info, reaction_idx, P, species_masses, species_indices)
     if isnothing(rate)
@@ -125,10 +143,20 @@ function create_reaction_system(
         freeze_factor
     end
     P = NamedTuple(Symbolics.getname(p) => p for p in ps)
-    masses = Dict(s.name => s.mass for s in species_list)
+
+    function is_positive_ion(name)::Bool
+        return endswith(name, "+")
+    end
 
     species_symbols = [only(@species $(Symbol(s.name))(t)) for s in species_list]
+    @observables begin
+        Symbol("E-") ~ sum(filter(is_positive_ion, (s.name for s in species_list)))
+    end
+
     species_indices = Dict(s.name => i for (i, s) in enumerate(species_list))
+    masses = Dict(s.name => s.mass for s in species_list)
+    masses["E-"] = 1.0 # Use mass 1 for E-, otherwise get mass 0 in freeze-out rate.
+
     @debug "Initialized $(length(species_symbols)) symbolic species"
     sp = Dict(s.name => x for (s, x) in zip(species_list, species_symbols))
 
