@@ -11,9 +11,10 @@ using JUCLCHEM:
     read_reaction_file,
     PhysicsState
 using Catalyst
-using OrdinaryDiffEq
-using OrdinaryDiffEqBDF
-using Sundials
+using OrdinaryDiffEq: Rodas5P
+using OrdinaryDiffEqBDF: QNDF, FBDF
+using Sundials: CVODE_BDF
+using ODEInterfaceDiffEq: radau
 
 const SUITE = BenchmarkGroup()
 
@@ -71,7 +72,7 @@ let
     )
 
     odeproblem = create_odeproblem(system, species_infos, reaction_infos, physics_state, u0)
-    for solver in [Rodas5P(), QNDF(), FBDF(), CVODE_BDF()]
+    for solver in [Rodas5P(), QNDF(), FBDF(), CVODE_BDF(), radau()]
         name = string(nameof(typeof(solver)))
         SUITE["model"][name] = @benchmarkable simulate($odeproblem, solver = $solver)
     end

@@ -118,13 +118,11 @@ function simulate(
     solver = Rodas5P(),
     save_timepoints::Vector{Float64} = DEFAULT_SAVE_T,
 )::ODESolution
-    sol = solve(
-        oprob,
-        solver;
+    sol = solve(oprob, solver;
         saveat = save_timepoints,
-        abstol = 1.0e-25,
+        abstol = 1.0e-15,
         reltol = 1.0e-7,
-        callback = PositiveDomain(),
+        # callback = PositiveDomain(),
     )
     return sol
 end
