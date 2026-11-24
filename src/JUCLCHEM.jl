@@ -81,7 +81,7 @@ function create_odeproblem(
     species::AbstractVector{SpeciesInfo},
     reactions::AbstractVector{ReactionInfo},
     physics_state::PhysicsState,
-    u0,
+    u0;
     tspan = (0, 1.0e6 * SECONDS_PER_YEAR),
 )::ODEProblem
     @debug "Creating ODEFunction from ReactionSystem"
@@ -105,21 +105,22 @@ end
 const DEFAULT_SAVE_T_COUNT = 100
 
 const DEFAULT_SAVE_T = [
-    0.0,
+    0.0
     collect(logrange(
         1.0e-7 * SECONDS_PER_YEAR,
         1.0e6 * SECONDS_PER_YEAR,
         DEFAULT_SAVE_T_COUNT - 1,
-    )),
+    ))
 ]
 
 function simulate(
-    oprob::ODEProblem,
-    save_timepoints::AbstractVector{Float64} = DEFAULT_SAVE_T,
+    oprob::ODEProblem;
+    solver = Rodas5P(),
+    save_timepoints::Vector{Float64} = DEFAULT_SAVE_T,
 )::ODESolution
     sol = solve(
         oprob,
-        Rodas5P();
+        solver;
         saveat = save_timepoints,
         abstol = 1.0e-25,
         reltol = 1.0e-7,

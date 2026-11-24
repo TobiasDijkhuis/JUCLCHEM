@@ -1,3 +1,7 @@
 [deps]
 BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
+Catalyst = "479239e8-5488-4da2-87a7-35f2df7eef83"
 JUCLCHEM = "1cef3fa9-e8f6-4710-aaef-3b323d294f4f"
+OrdinaryDiffEq = "1dea7af3-3e70-54e6-95c3-0bf5283fa5ed"
+OrdinaryDiffEqBDF = "6ad6398a-0878-4a85-9266-38940aa047c8"
+Sundials = "c3572dad-4567-51f8-b174-8c6c989267f4"
