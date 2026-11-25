@@ -10,4 +10,9 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
 Catalyst = "17.0.2"
+DiffEqCallbacks = "4.19.6"
+Revise = "3.18.0"
+SciMLBase = "3.58.0"
+SymbolicIndexingInterface = "0.3.56"
+Symbolics = "7.49.0"
 Test = "<0.0.1, 1"
