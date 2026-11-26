@@ -21,7 +21,8 @@ using JUCLCHEM:
     create_odeproblem,
     create_initial_conditions,
     simulate,
-    initialize_reaction
+    initialize_reaction,
+    is_positive_ion
 using Catalyst
 using Symbolics
 using SciMLBase
@@ -36,6 +37,7 @@ using SymbolicIndexingInterface
             p1 = missing,
             p2 = missing,
             p3 = missing,
+            p4 = missing,
             α = 0,
             β = 0,
             γ = 0,
@@ -68,7 +70,7 @@ let
             "T_MAX" => 10000,
         )
     end
-    function make_dummy_info(r1, r2, type, p1, p2, p3)
+    function make_dummy_info(r1, r2, type, p1, p2, p3, p4)
         return ReactionInfo((
             r1 = r1,
             r2 = r2,
@@ -76,6 +78,7 @@ let
             p1 = p1,
             p2 = p2,
             p3 = p3,
+            p4 = p4,
             α = 0,
             β = 0,
             γ = 0,
@@ -86,19 +89,19 @@ let
     @testset "initialize_reaction $row" for (row, expected_info) in [
             (
                 ["C", "O", "", "CO", "NAN"],
-                make_dummy_info("C", "O", TWOBODY, "CO", missing, missing),
+                make_dummy_info("C", "O", TWOBODY, "CO", missing, missing, missing),
             ),
             (
                 ["#C", "BULKSWAP", "", "@C", "NAN"],
-                make_dummy_info("#C", missing, BULKSWAP, "@C", missing, missing),
+                make_dummy_info("#C", missing, BULKSWAP, "@C", missing, missing, missing),
             ),
             (
                 ["#C", "#O", "LH", "#CO", "NAN"],
-                make_dummy_info("#C", "#O", LH, "#CO", missing, missing),
+                make_dummy_info("#C", "#O", LH, "#CO", missing, missing, missing),
             ),
             (
                 ["#CH3OH", "#OH", "LH", "#CH3O", "#H2O"],
-                make_dummy_info("#CH3OH", "#OH", LH, "#CH3O", "#H2O", missing),
+                make_dummy_info("#CH3OH", "#OH", LH, "#CH3O", "#H2O", missing, missing),
             ),
         ]
         @test isequal(initialize_reaction(finish_row(row)), expected_info)
@@ -113,6 +116,14 @@ end
     @test_throws KeyError _get_reaction_type(["C", "O2", "unknown_kw"])
 end
 
+@testset "is_positive_ion" begin
+    @test !is_positive_ion("C")
+    @test is_positive_ion("C+")
+    @test !is_positive_ion("C-")
+    @test is_positive_ion("H+")
+    @test is_positive_ion("CH3+")
+end
+
 let
     function make_reaction_info(; r1, r2, p1, p2)::ReactionInfo
         return ReactionInfo((
@@ -122,6 +133,7 @@ let
             p1 = p1,
             p2 = p2,
             p3 = missing,
+            p4 = missing,
             α = 0,
             β = 0,
             γ = 0,
@@ -195,6 +207,7 @@ let
             p1 = missing,
             p2 = missing,
             p3 = missing,
+            p4 = missing,
             α = 0,
             β = 0,
             γ = 0,
@@ -248,6 +261,7 @@ end
         p1,
         p2,
         p3,
+        p4,
     )::ReactionInfo
         type = REACTION_TYPE_LOOKUP[reaction_type]
         return ReactionInfo((
@@ -257,6 +271,7 @@ end
             p1 = p1,
             p2 = p2,
             p3 = p3,
+            p4 = p4,
             α = 1.0,
             β = 1.0,
             γ = 1.0,
@@ -266,8 +281,10 @@ end
     end
     species_infos = [make_dummy_species(name) for name in ["C", "O", "CO"]]
     reaction_infos = [
-        make_dummy_reaction(r1, r2, type, p1, p2, p3)
-        for (r1, r2, type, p1, p2, p3) in [("C", "O", "TWOBODY", "CO", missing, missing)]
+        make_dummy_reaction(r1, r2, type, p1, p2, p3, p4)
+        for (r1, r2, type, p1, p2, p3, p4) in [
+            ("C", "O", "TWOBODY", "CO", missing, missing, missing),
+        ]
     ]
 
     rs = create_reaction_system(species_infos, reaction_infos)

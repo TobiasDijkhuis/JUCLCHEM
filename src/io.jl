@@ -64,6 +64,7 @@ function initialize_reaction(row)::ReactionInfo
         p1 = _is_real_species(row["PRODUCT 1"]) ? row["PRODUCT 1"] : missing,
         p2 = _is_real_species(row["PRODUCT 2"]) ? row["PRODUCT 2"] : missing,
         p3 = _is_real_species(row["PRODUCT 3"]) ? row["PRODUCT 3"] : missing,
+        p4 = _is_real_species(row["PRODUCT 4"]) ? row["PRODUCT 4"] : missing,
         α = row["ALPHA"],
         β = row["BETA"],
         γ = row["GAMMA"],

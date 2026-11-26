@@ -48,3 +48,9 @@ end
 function get_crp_rate_constant(α, ζ)
     return α * ζ
 end
+
+@register_symbolic get_twobody_rate_constant(α, β, γ, T_gas)
+@register_symbolic get_ionopol1_rate_constant(α, β, γ, T_gas)
+@register_symbolic get_ionopol2_rate_constant(α, β, γ, T_gas)
+@register_symbolic get_crp_photo_rate_constant(α, β, γ, ω_dust, ζ, T_gas)
+@register_symbolic get_crp_rate_constant(α, ζ)

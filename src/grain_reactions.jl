@@ -199,12 +199,9 @@ function get_langmuir_hinshelwood_rate_constant(
     E_diff_j,
     mass_i,
     mass_j,
-    μ_ij = missing,
+    μ_ij = get_reduced_mass(mass_i, mass_j),
     barrier_width = 1.4,
 )
-    if ismissing(μ_ij)
-        μ_ij = get_reduced_mass(mass_i, mass_j)
-    end
     ν_HH_i = get_ν_HH(E_bind_i, mass_i)
     k_diff_i = get_thermal_diffusion_rate_constant(E_diff_i, ν_HH_i, T_dust)
     k_des_i = get_thermal_desorption_rate_constant(1.0, E_bind_i, ν_HH_i, T_dust)
@@ -242,3 +239,25 @@ end
 function get_crp_desorption_rate()
     error("unimplemented")
 end
+
+@register_symbolic get_langmuir_hinshelwood_rate_constant(
+    E_reac,
+    T_dust,
+    E_bind_i,
+    E_bind_j,
+    E_diff_i,
+    E_diff_j,
+    mass_i,
+    mass_j,
+    μ_ij,
+    barrier_width,
+)
+@register_symbolic get_eley_rideal_rate_constant(
+    freezeout_rate,
+    γ,
+    T_dust,
+    total_surface_abundance,
+    μ_ij,
+)
+@register_symbolic get_CT_H2_form_efficiency(T_gas, T_dust)
+@register_symbolic get_thermal_desorption_rate_constant(α, E_bind, ν_des, T_dust)

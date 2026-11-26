@@ -18,6 +18,7 @@ const DEFAULT_ELEMENTAL_ABUNDANCES = Dict{String, Float64}(
     "H" => 1.0,
     "HE" => 0.1,
     "C" => 1.77e-4,
+    "O" => 3.34e-4,
     "N" => 6.18e-5,
     "S" => 3.51e-6,
     "MG" => 2.256e-6,
@@ -42,6 +43,12 @@ function create_initial_conditions(species_symbols)
         end
         initial_conditions[by_name[element]] = abundance
     end
+
+    initial_conditions[by_name["E-"]] = sum(
+        initial_conditions[symbol]
+        for (name, symbol) in pairs(by_name)
+        if is_positive_ion(name)
+    )
     return initial_conditions
 end
 
@@ -115,13 +122,13 @@ const DEFAULT_SAVE_T = [
 
 function simulate(
     oprob::ODEProblem;
-    solver = Rodas5P(),
+    solver = FBDF(),
     save_timepoints::Vector{Float64} = DEFAULT_SAVE_T,
 )::ODESolution
     sol = solve(oprob, solver;
         saveat = save_timepoints,
-        abstol = 1.0e-15,
-        reltol = 1.0e-7,
+        abstol = 1.0e-25,
+        reltol = 1.0e-15,
         # callback = PositiveDomain(),
     )
     return sol

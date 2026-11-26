@@ -29,7 +29,6 @@ ps = PhysicsState(
     radfield = 1.0,
     ζ = 1.0,
 )
-print(ps)
 odeprob = create_odeproblem(system, species_list, reactions_list, ps, u0)
 
 sol = simulate(odeprob)

@@ -29,6 +29,7 @@ const ReactionInfo = @NamedTuple begin
     p1::Union{String, Missing}
     p2::Union{String, Missing}
     p3::Union{String, Missing}
+    p4::Union{String, Missing}
     α
     β
     γ
@@ -91,5 +92,5 @@ end
 
 Get the pure products (without 'NAN')"""
 function get_pure_products(r::ReactionInfo)::AbstractVector{String}
-    return [x for x in (r.p1, r.p2, r.p3) if _is_real_species(x)]
+    return [x for x in (r.p1, r.p2, r.p3, r.p4) if _is_real_species(x)]
 end

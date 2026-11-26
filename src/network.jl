@@ -3,12 +3,12 @@ using Catalyst
 using Symbolics
 
 """
-    get_symbolic_rate(reaction_info, reaction_idx, P, masses, species_indices)
+    get_symbolic_rate_raw(reaction_info, reaction_idx, P, masses, species_indices)
 
 Get the symbolic function to calculate the reaction rate of a reaction,
 depending on its type.
 """
-function get_symbolic_rate(
+function get_symbolic_rate_raw(
     reaction_info::ReactionInfo,
     reaction_idx::Int,
     P::NamedTuple,
@@ -96,6 +96,28 @@ function get_symbolic_rate(
     else
         return nothing
     end
+end
+
+function clamp_T(T, T_min, T_max, k)
+    return (T_min <= T <= T_max) ? k : zero(k)
+end
+@register_symbolic clamp_T(T, T_min, T_max, k)
+
+function get_symbolic_rate(
+    reaction_info::ReactionInfo,
+    reaction_idx::Int,
+    P::NamedTuple,
+    masses::Dict{String, Float64},
+    species_indices::Dict{String, Int},
+)::Union{Symbolics.Num, Nothing}
+    rate = get_symbolic_rate_raw(reaction_info, reaction_idx, P, masses, species_indices)
+    if isnothing(rate)
+        return nothing
+    end
+    if ismissing(reaction_info.T_min) || ismissing(reaction_info.T_max)
+        return rate
+    end
+    return clamp_T(P.T_gas, reaction_info.T_min, reaction_info.T_max, rate)
 end
 
 function create_catalyst_reaction(
