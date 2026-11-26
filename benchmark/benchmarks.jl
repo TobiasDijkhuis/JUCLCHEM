@@ -28,6 +28,7 @@ function make_dummy_reaction(
     p1,
     p2,
     p3,
+    p4,
 )::ReactionInfo
     type = REACTION_TYPE_LOOKUP[reaction_type]
     return ReactionInfo((
@@ -37,6 +38,7 @@ function make_dummy_reaction(
         p1 = p1,
         p2 = p2,
         p3 = p3,
+        p4 = p4,
         α = 1.0,
         β = 1.0,
         γ = 1.0,
@@ -46,8 +48,10 @@ function make_dummy_reaction(
 end
 species_infos = [make_dummy_species(name) for name in ["C", "O", "CO"]]
 reaction_infos = [
-    make_dummy_reaction(r1, r2, type, p1, p2, p3)
-    for (r1, r2, type, p1, p2, p3) in [("C", "O", "TWOBODY", "CO", missing, missing)]
+    make_dummy_reaction(r1, r2, type, p1, p2, p3, p4)
+    for (r1, r2, type, p1, p2, p3, p4) in [
+        ("C", "O", "TWOBODY", "CO", missing, missing, missing),
+    ]
 ]
 
 SUITE["create_reaction_system"] = @benchmarkable create_reaction_system(
