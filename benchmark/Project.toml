@@ -1,8 +1,13 @@
 [deps]
 BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
 Catalyst = "479239e8-5488-4da2-87a7-35f2df7eef83"
+DiffEqDevTools = "f3b72e0c-5b89-59e1-b016-84e28bfd966d"
 JUCLCHEM = "1cef3fa9-e8f6-4710-aaef-3b323d294f4f"
+LSODA = "7f56f5a3-f504-529b-bc02-0b1fe5e64312"
 ODEInterfaceDiffEq = "09606e27-ecf5-54fc-bb29-004bd9f985bf"
 OrdinaryDiffEq = "1dea7af3-3e70-54e6-95c3-0bf5283fa5ed"
 OrdinaryDiffEqBDF = "6ad6398a-0878-4a85-9266-38940aa047c8"
+OrdinaryDiffEqExtrapolation = "becaefa8-8ca2-5cf9-886d-c06f3d2bd2c4"
+OrdinaryDiffEqRosenbrock = "43230ef6-c299-4910-a778-202eb28ce4ce"
+Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 Sundials = "c3572dad-4567-51f8-b174-8c6c989267f4"

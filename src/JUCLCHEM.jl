@@ -90,6 +90,7 @@ function create_odeproblem(
     physics_state::PhysicsState,
     u0;
     tspan = (0, 1.0e6 * SECONDS_PER_YEAR),
+    kwargs...,
 )::ODEProblem
     @debug "Creating ODEFunction from ReactionSystem"
     ode_sys = complete(ode_model(system))
@@ -98,15 +99,7 @@ function create_odeproblem(
     pmap = Dict(getproperty(system, k) => v for (k, v) in pm)
 
     @debug "Creating ODEProblem"
-    return ODEProblem(
-        ode_sys,
-        merge(u0, pmap),
-        tspan;
-        sparse = true,
-        checks = true,
-        remove_conserved = true,
-        jac = true,
-    )
+    return ODEProblem(ode_sys, merge(u0, pmap), tspan; kwargs)
 end
 
 const DEFAULT_SAVE_T_COUNT = 100
