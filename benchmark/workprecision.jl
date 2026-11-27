@@ -37,7 +37,7 @@ odeproblem = create_odeproblem(
     species_infos,
     reaction_infos,
     physics_state,
-    u0,
+    u0 = u0,
     jac = true,
     sparse = true,
     remove_conserved = true,

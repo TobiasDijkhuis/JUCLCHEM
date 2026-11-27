@@ -75,7 +75,13 @@ let
         ζ = 1,
     )
 
-    odeproblem = create_odeproblem(system, species_infos, reaction_infos, physics_state, u0)
+    odeproblem = create_odeproblem(
+        system,
+        species_infos,
+        reaction_infos,
+        physics_state,
+        u0 = u0,
+    )
     for solver in [Rodas5P(), QNDF(), FBDF(), CVODE_BDF(), radau()]
         name = string(nameof(typeof(solver)))
         SUITE["model"][name] = @benchmarkable simulate($odeproblem, solver = $solver)
