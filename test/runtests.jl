@@ -319,7 +319,7 @@ end
         A_V = 1.0,
         n_H = 1.0e4,
     )
-    odeprob = create_odeproblem(system, species_list, reactions_list, ps, u0)
+    odeprob = create_odeproblem(system, species_list, reactions_list, ps, u0 = u0)
 
     @test isequal(Set(keys(u0)), Set(species_symbols))
 

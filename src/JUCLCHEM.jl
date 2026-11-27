@@ -1,6 +1,7 @@
 module JUCLCHEM
 using Catalyst
 using OrdinaryDiffEq
+using OrdinaryDiffEqBDF
 using SymbolicUtils
 using DifferentialEquations
 using DiffEqCallbacks
@@ -87,8 +88,8 @@ function create_odeproblem(
     system::ReactionSystem,
     species::AbstractVector{SpeciesInfo},
     reactions::AbstractVector{ReactionInfo},
-    physics_state::PhysicsState,
-    u0;
+    physics_state::PhysicsState;
+    u0 = create_initial_conditions(species(system)),
     tspan = (0, 1.0e6 * SECONDS_PER_YEAR),
     kwargs...,
 )::ODEProblem
@@ -115,7 +116,7 @@ const DEFAULT_SAVE_T = [
 
 function simulate(
     oprob::ODEProblem;
-    solver = FBDF(),
+    solver = QNDF(),
     save_timepoints::Vector{Float64} = DEFAULT_SAVE_T,
 )::ODESolution
     sol = solve(oprob, solver;

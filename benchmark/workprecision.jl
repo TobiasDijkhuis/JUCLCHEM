@@ -9,10 +9,9 @@ using JUCLCHEM:
 using Catalyst
 using OrdinaryDiffEq: Rodas5P
 using OrdinaryDiffEqBDF: QNDF, FBDF, NordsieckBDF
-using OrdinaryDiffEqRosenbrock: Rodas4, Rodas4P
+using OrdinaryDiffEqRosenbrock: Rodas4P
 using Sundials: CVODE_BDF
-using ODEInterfaceDiffEq: radau, rodas, ddebdf
-using LSODA: lsoda
+using ODEInterfaceDiffEq: radau, ddebdf
 using OrdinaryDiffEqExtrapolation:
     ImplicitEulerExtrapolation,
     ImplicitEulerBarycentricExtrapolation
